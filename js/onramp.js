@@ -868,3 +868,74 @@ showInfo();//!!!! change to showInfoString() plus strings defined inline or as e
 
 var myRun=setInterval(main_loop, 1000/fps);
 
+
+//Projet modélisation de système complexe, ajouts :
+
+
+// Fonction objectif (à minimiser)
+function simuleDensity(inputsSimulation) {
+
+  // REMPLACER PAR UNE SIMULATION AVEC LES PARAMETRES CHOISIS
+
+  let density = 0; // On chercher le minimum de densité
+  return density;
+}
+
+function simuleFlux(inputsSimulation) {
+
+  // REMPLACER PAR UNE SIMULATION AVEC LES PARAMETRES CHOISIS
+  let flux;
+
+  return -flux;  // On cherche le maximum de flux
+}
+
+// Fonction de transition (modification aléatoire de la variable politesse)
+function transitionPoliteness(inputsSimulation, temperature) {
+  inputsSimulation[3] = inputsSimulation[3] + (Math.random() - 0.5) * temperature;
+  return inputsSimulation[3];
+}
+
+// Algorithme de recuit simulé
+function recuitSimulePoliteness(inputsSimulation, borneInferieure, borneSuperieure, temperatureInitiale, tauxRefroidissement, mode) {
+  let politesseCourante = Math.random() * (borneSuperieure - borneInferieure) + borneInferieure; //La première valeure est aléatoire à l'intérieur des bornes
+  inputsSimulation[3] = politesseCourante;
+  let meilleuresInputs = inputsSimulation;
+  let temperature = temperatureInitiale;
+
+  while (temperature > 0.1) {  // Critère d'arrêt (à ajuster), peut aussi être remplacé par un nombre maximal d'itération
+    const nouvelleSolution = transitionPoliteness(inputsSimulation, temperature);
+    const deltaE = simuleDensity(nouvelleSolution) - simuleDensity(solutionCourante);
+
+    if (deltaE < 0 || Math.random() < Math.exp(-deltaE / temperature)) {
+      solutionCourante = nouvelleSolution;
+    }
+
+    if (simuleDensity(solutionCourante) < simuleDensity(meilleureSolution)) {
+      meilleureSolution = solutionCourante;
+    }
+
+    temperature *= tauxRefroidissement;
+  }
+
+  return meilleureSolution;
+}
+
+// Première utilisation
+let inputsSimulation = [nbVoie, trafic, vmax, politeness, securedistance, acceleration, mode]; //mode 1 : density, mode 2 : flux
+
+console.log("Scénario 1 : Optimisation de la politesse dans une nationale française pour réduire la densité du trafic");
+const temperatureInitiale = 100; //valeur choisie de manière empirique
+const tauxRefroidissement = 0.95; //valeur classique permettant à chaque itération k de diminuer légèrement la température (T(k+1) = T(k)*tauxRefroidissement)
+
+function Situation1politeness(mode){
+  inputsSimulation = [2, 1400, 90, 0.3, 2, 2.5, mode];
+
+  let borneSuperieure = 1; //max de l'input que l'on cherche à optimiser, ici la politesse en m.s^-2
+  let borneInferieure = -0.2;
+  let result = recuitSimulePoliteness(inputsSimulation, borneInferieure, borneSuperieure, temperatureInitiale, tauxRefroidissement, mode);
+
+}
+
+
+console.log("Meilleure solution trouvée :", Situation1politeness(1));
+console.log("Valeur de la densité pour cette solution:", fonctionObjectif(meilleureSolution));
